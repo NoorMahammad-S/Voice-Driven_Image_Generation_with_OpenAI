@@ -1,3 +1,5 @@
+# ```                AI & ML Project                ```
+
 # Voice-Driven Image Generation with OpenAI
 
 This Flask application captures voice input, processes it using OpenAI's GPT-3 and DALL-E models, and generates an image based on the processed text. Real-time updates are sent to the UI using Flask-SocketIO.
