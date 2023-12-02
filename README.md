@@ -33,10 +33,6 @@ This Flask application captures voice input, processes it using OpenAI's GPT-3 a
 
 - **Environment Variables**: Ensure that you set any necessary environment variables, especially `OPENAI_API_KEY`.
 
-## Deployment
-
-This application is designed for local development. If you plan to deploy it to a public server, consider security measures, such as using HTTPS and securing your API key.
-
 ## Contributing
 
 Feel free to contribute to the project by opening issues or submitting pull requests.
