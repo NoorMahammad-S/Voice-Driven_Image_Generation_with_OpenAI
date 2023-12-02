@@ -1,12 +1,17 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+from flask_socketio import SocketIO
 import openai
 import speech_recognition as sr
+import threading
 import time
+import os
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
-# Set up your OpenAI API keys
-openai.api_key = "YOUR_OPENAI_API_KEY"
+# Set up your OpenAI API key
+openai.api_key = os.getenv("OPENAI_API_KEY")  # Use environment variable for API key
+
 
 def capture_voice():
     recognizer = sr.Recognizer()
@@ -25,6 +30,7 @@ def capture_voice():
         print(f"Could not request results from Google Speech Recognition service; {e}")
         return None
 
+
 def gpt3_text_understanding(text):
     response = openai.Completion.create(
         engine="text-davinci-002",
@@ -32,6 +38,7 @@ def gpt3_text_understanding(text):
         max_tokens=100
     )
     return response.choices[0].text.strip()
+
 
 def dalle_image_generation(prompt):
     response = openai.Image.create(
@@ -42,26 +49,30 @@ def dalle_image_generation(prompt):
     image_url = response['data'][0]['url']
     return image_url
 
+
 def simulate_real_time_interaction(image_url):
-    updates = []
-
     for i in range(1, 6):
-        updates.append(f"Update {i}: Processing...")
         time.sleep(2)  # Simulate processing time
+        socketio.emit('update', f"Update {i}: Processing...")
 
-    updates.append(f"Image generated: {image_url}")
-    return updates
+    socketio.emit('update', f"Image generated: {image_url}")
+
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+
+@socketio.on('voice_input')
+def handle_voice_input():
     voice_input = capture_voice()
 
     if voice_input:
         gpt3_output = gpt3_text_understanding(voice_input)
         dalle_output = dalle_image_generation(gpt3_output)
-        updates = simulate_real_time_interaction(dalle_output)
 
-        return render_template('index.html', updates=updates, image_url=dalle_output)
+        threading.Thread(target=simulate_real_time_interaction, args=(dalle_output,)).start()
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)

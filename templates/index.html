@@ -4,16 +4,30 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice-to-Image Generator</title>
+    <title>Voice-Driven Image Generation</title>
 </head>
 <body>
-    <h1>Voice-to-Image Generator</h1>
-    <div>
-        <p>Real-time Updates:</p>
-        {% for update in updates %}
-            <p>{{ update }}</p>
-        {% endfor %}
-        <img src="{{ image_url }}" alt="Generated Image">
-    </div>
+    <button onclick="startRecording()">Start Recording</button>
+    <div id="updates-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
+    <script>
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        function startRecording() {
+            socket.emit('voice_input');
+        }
+
+        socket.on('update', function(data) {
+            console.log(data);
+            // Update the UI with the received data
+            updateUI(data);
+        });
+
+        function updateUI(data) {
+            const updatesContainer = document.getElementById('updates-container');
+            updatesContainer.innerHTML += `<p>${data}</p>`;
+        }
+    </script>
 </body>
 </html>
