@@ -38,4 +38,3 @@ This Flask application captures voice input, processes it using OpenAI's GPT-3 a
 ## Contributing
 
 Feel free to contribute to the project by opening issues or submitting pull requests.
-
